@@ -1,6 +1,7 @@
 __author__ = 'f5xs'
 
-from level1              import area_check, coprime, currenttime, dim_check, freq_threshold, url_make, Sleep
+from level1              import area_check, coprime, currenttime, delete_minimals, dim_check, freq_threshold, url_make,\
+                                Sleep
 from PIL                 import Image
 from re                  import match, sub
 from requests            import ConnectionError, get, Timeout
