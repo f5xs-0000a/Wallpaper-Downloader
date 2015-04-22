@@ -1,15 +1,19 @@
 __author__ = 'f5xs'
 
-from level1 import area_check, BytesIO, currenttime, dim_check, exists, findall, LinkList, loads,  \
-    mkdir, randint, remove, wallpaper_dir, config_file, Thread, UnexpectedFewThreadsError, enumerateT, Config
-from level2 import Req, image_check, Link, Sleep
-from pickle import load, dump
-from requests.exceptions import HTTPError
+from level1              import area_check, Config, config_file, currenttime, dim_check, LinkList,\
+                                UnexpectedFewThreadsError, wallpaper_dir
+from level2              import Req, image_check, Link, Sleep
 
-"""
-Transform this piece of code (including Level 4) into an object-oriented code that uses a single class (or more) to
-  control all the queued, parsable, and rejected links and the domain data.
-"""
+from io                  import BytesIO
+from json                import loads
+from os                  import remove, mkdir
+from os.path             import exists
+from pickle              import load, dump
+from random              import randint
+from re                  import findall
+from requests.exceptions import HTTPError
+from threading           import Thread
+from threading           import enumerate as enumerateT
 
 
 class Downloader(object):
@@ -165,32 +169,6 @@ class Downloader(object):
             self.links.data["_4chan"] = lastpost
         except NameError:
             pass
-
-    def _8chan(self, cutoff=0, boards=("wg", "w", "wall")):
-        # Fix the extra files issue with this.
-        # Fix the file naming issue with this.
-        # Reference: http://8ch.net/wg/res/%s.json
-        threads = []
-        lastpost = 0
-        for board in boards:
-            request = Req("http://8ch.net/%s/threads.json" % board, str_data=True)
-            for page in loads(request.text):
-                for thread in page["threads"]:
-                    threads.append((board, thread["no"]))
-        for thread in threads:
-            request = Req("http://8ch.net/%s/res/%s.json" % (thread[0], thread[1]), str_data=True)
-            for post in loads(request.text)["posts"]:
-                if False not in (key in post for key in ["w", "h", "tim", "ext"]):
-                    post["tim"] = int(post["tim"])
-                    if dim_check(post["w"], post["h"]) and area_check(post["w"], post["h"]) and post["tim"] > cutoff \
-                            and post["ext"].lower() in (".jpg", "jpeg", "png"):
-                        if "_8chan" not in self.links.queue:
-                            self.links.queue["_8chan"] = LinkList()
-                        self.links.queue["_8chan"].add(Link("http://media.8ch.net/%s/src/%s%s" %
-                                                            (thread[0], post["tim"], post["ext"]),
-                                                            post["w"], post["h"]))
-                        if post["tim"] > lastpost:
-                            lastpost = post["tim"]
 
     def konachan(self, cutoff=0):
         page = 1

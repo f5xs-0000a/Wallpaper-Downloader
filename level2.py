@@ -1,7 +1,11 @@
 __author__ = 'f5xs'
 
-from level1 import area_check, ConnectionError, currenttime, dim_check, freq_threshold, get, HTTPError, Image,\
-    Sleep, Thread, Timeout, url_make, coprime, ChunkedEncodingError, match, sub
+from level1              import area_check, coprime, currenttime, dim_check, freq_threshold, url_make, Sleep
+from PIL                 import Image
+from re                  import match, sub
+from requests            import ConnectionError, get, Timeout
+from requests.exceptions import ChunkedEncodingError, HTTPError
+from threading           import Thread
 
 
 def image_check(image_file, *args):
@@ -16,7 +20,9 @@ def image_check(image_file, *args):
                 else:
                     return
             if "colors" in args:
-                if max([color[0] for color in image.getcolors(image.size[0]*image.size[1])]) / \
+                if not delete_minimals:
+                    pass
+                elif max([color[0] for color in image.getcolors(image.size[0]*image.size[1])]) / \
                         (image.size[0]*image.size[1]) < freq_threshold:
                     pass
                 else:
@@ -29,6 +35,7 @@ def image_check(image_file, *args):
             value[0] = True
         except MemoryError:
             return
+
     thread = Thread(target=__init__, args=(value,))
     thread.daemon = True
     thread.start()
@@ -112,7 +119,12 @@ class Req(object):
         return self.request.json()
 
 
+
 class Link(object):
+    #       Here's a Blue Link: http://i.imgur.com/grmKzK1.jpg
+    # And here's a Purple Link: http://i.imgur.com/B1vfIwx.png
+    # HEEEYYYYAAAAAA!!!
+
     def __init__(self, link, width, height):
         self.link = link
         self.width, self.height = coprime(width, height)

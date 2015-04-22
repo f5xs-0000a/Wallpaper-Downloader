@@ -1,36 +1,34 @@
 __author__ = 'f5xs'
 
-"""
-Issues:
-1. image_downloader will no longer handle overwriting the queue file. Another function that would be run every 15
-        seconds and during Exception raises will handle it.
-"""
-
-from copy import deepcopy
-from io import BytesIO
-from json import dumps, loads
-from os import getcwd, remove, mkdir
-from os.path import exists
-from PIL import Image
-from random import randint
-from re import match, sub, findall
-from requests import ConnectionError, get, HTTPError, Timeout
-from requests.exceptions import ChunkedEncodingError
-from signal import alarm, SIGALRM, signal
+from json      import dumps, loads
+from os        import getcwd
 from threading import Thread
-from threading import enumerate as enumerateT
-from time import localtime, sleep, strftime
+from time      import localtime, sleep, strftime
 
 cwd = getcwd()
-dimensions = [(16, 9)]  # (8, 5)
+
 dims_threshold = 1./512
 freq_threshold = .125
 size_threshold = 1366*768
+delete_minimals = True
+dimensions = [(16, 9)]  # Include your preferred aspect ratio here (may it be (8, 5) or (4, 3))
+                        # oh, and if you still want 4:3 wallpapers, I suggest you change your monitor now
+
 wallpaper_dir = "%s/Wallpapers" % cwd
 config_file = "links.f5xs"
 
 
+# =====================================================================================================================
+
+
 currenttime = lambda: "[%s] " % (strftime("%H:%M:%S", localtime()))
+
+
+area_check = lambda width, height: width*height > size_threshold
+
+
+url_make = lambda url, params: "%s?%s" % (url, "&".join(["%s=%s" % (key, params[key]) for key in params])) if params \
+    else url
 
 
 def dim_check(width, height):
@@ -38,9 +36,6 @@ def dim_check(width, height):
         if float(ar[0])/ar[1]*(1-dims_threshold) <= float(width)/height <= float(ar[0])/ar[1]*(1+dims_threshold):
             return ar
     return None
-
-
-area_check = lambda width, height: width*height > size_threshold
 
 
 class Sleep(object):
@@ -71,14 +66,6 @@ def coprime(*args):
         return_value = gcd(return_value, arg)
 
     return tuple([int(arg/return_value) for arg in args])
-
-
-class UnexpectedFewThreadsError(Exception):
-    pass
-
-
-url_make = lambda url, params: "%s?%s" % (url, "&".join(["%s=%s" % (key, params[key]) for key in params])) if params \
-    else url
 
 
 class LinkList(object):
@@ -154,3 +141,7 @@ class Config(object):
 
         self.data["konachan"] = 0
         self.data["_4chan"] = 0
+
+
+class UnexpectedFewThreadsError(Exception):
+    pass

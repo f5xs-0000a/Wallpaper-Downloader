@@ -1,0 +1,36 @@
+Issues:
+1. image_downloader will no longer handle overwriting the queue file. Another function that would be run every 15
+        seconds and during Exception raises will handle it.
+
+To do:
+1. Transform Level 3 into an object-oriented code that uses a single class (or more) to control all the queued,
+   parsable, and rejected links and the domain data.
+2. Fix _8chan(). The faulty code is provided below:
+
+"""
+    def _8chan(self, cutoff=0, boards=("wg", "w", "wall")):
+        # Fix the extra files issue with this.
+        # Fix the file naming issue with this.
+        # Reference: http://8ch.net/wg/res/%s.json
+        threads = []
+        lastpost = 0
+        for board in boards:
+            request = Req("http://8ch.net/%s/threads.json" % board, str_data=True)
+            for page in loads(request.text):
+                for thread in page["threads"]:
+                    threads.append((board, thread["no"]))
+        for thread in threads:
+            request = Req("http://8ch.net/%s/res/%s.json" % (thread[0], thread[1]), str_data=True)
+            for post in loads(request.text)["posts"]:
+                if False not in (key in post for key in ["w", "h", "tim", "ext"]):
+                    post["tim"] = int(post["tim"])
+                    if dim_check(post["w"], post["h"]) and area_check(post["w"], post["h"]) and post["tim"] > cutoff \
+                            and post["ext"].lower() in (".jpg", "jpeg", "png"):
+                        if "_8chan" not in self.links.queue:
+                            self.links.queue["_8chan"] = LinkList()
+                        self.links.queue["_8chan"].add(Link("http://media.8ch.net/%s/src/%s%s" %
+                                                            (thread[0], post["tim"], post["ext"]),
+                                                            post["w"], post["h"]))
+                        if post["tim"] > lastpost:
+                            lastpost = post["tim"]
+"""
