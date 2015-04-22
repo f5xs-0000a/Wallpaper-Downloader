@@ -15,7 +15,7 @@ Cons:
 * Automatic CLI. Not much interactivity.
 * May produce unexpected results when computer is full in memory
 * This program does not distinguish pornography so if you're asking why there's porn in your wallpapers, don't. It should be wise for the user to check all the downloaded wallpapers first before using them.
-* This is an unfinished project. I have no time to finish this especially when there is academics to follow.
+* This is an unfinished project. I have no time to finish this especially when there is academics to follow. Also, F5XS-SC_0 is more prioritized than this.
 
 
 Unimplemented features:
